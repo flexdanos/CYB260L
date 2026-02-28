@@ -1,0 +1,83 @@
+# ==========================================
+# Description: Initial creation of CloudFormation template to deploy a VPC 
+# spanning 3 Availability Zones in us-west-2 with public subnets and Internet Gateway
+# Revision: 1.0
+# Date: 2026-02-28
+# ==========================================
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create a VPC spanning 3 Availability Zones in us-west-2
+
+Parameters:
+  StudentID:
+    Type: String
+    Default: studentID
+    Description: Enter your ECPI student ID
+
+Resources:
+
+  StudentVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub VPC-${StudentID}
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub IGW-${StudentID}
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref StudentVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref StudentVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: us-west-2a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub PublicSubnet-AZ1-${StudentID}
+
+  PublicSubnetAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref StudentVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: us-west-2b
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub PublicSubnet-AZ2-${StudentID}
+
+  PublicSubnetAZ3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref StudentVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: us-west-2c
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub PublicSubnet-AZ3-${StudentID}
+
+Outputs:
+
+  VPCId:
+    Description: The ID of the created VPC
+    Value: !Ref StudentVPC
+
+  VPCName:
+    Description: The Name of the created VPC
+    Value: !Sub VPC-${StudentID}
